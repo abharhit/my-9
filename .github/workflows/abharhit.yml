@@ -1,4 +1,4 @@
-name: linker
+name: abharhit
 
 # Minimal instance: Tailscale (exit node) + 9router ONLY.
 # No Hermes, no h-dashboard, no PHP/Docker/SSH server.
@@ -15,7 +15,7 @@ name: linker
 # chained run never overlap (no duplicate Tailscale hostname, no
 # sync-push race).
 #
-# TO STOP THE CHAIN: Actions tab -> linker -> "..." -> Disable workflow.
+# TO STOP THE CHAIN: Actions tab -> abharhit -> "..." -> Disable workflow.
 # (Cancelling one run is NOT a stop signal by design here: the sync step
 # still runs, but the dispatch step is skipped on a cancelled job — so a
 # manual cancel also breaks the chain and only the schedule rescue or a
@@ -41,7 +41,7 @@ on:
     - cron: '17 */6 * * *'
 
 concurrency:
-  group: linker-lite
+  group: abharhit-lite
   cancel-in-progress: false
 
 jobs:
@@ -49,8 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 355
     env:
-      WF_NAME: linker
-      REPO: Shabakebehdasht/my-9
+      WF_NAME: abharhit
+      REPO: abharhit/my-9
 
     steps:
       - name: 0. Wait 10 min for previous instance's Tailscale logout
@@ -139,10 +139,10 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         run: |
           cd "${GITHUB_WORKSPACE:-.}"
-          git config user.name "Shabakebehdasht"
-          git config user.email "Shabakebehdasht@users.noreply.github.com"
+          git config user.name "abharhit"
+          git config user.email "abharhit@users.noreply.github.com"
           # Authenticate with PAT for push
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Shabakebehdasht/my-9.git"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/abharhit/my-9.git"
 
           # Copy the 9router database back to the repo (the ONLY state
           # this minimal instance has — no hermes/ sync any more)
@@ -157,7 +157,7 @@ jobs:
             echo 'ℹ️ No changes to commit'
           else
             git add 9router/ 2>/dev/null || true
-            git commit -m "Sync 9router data from linker instance"
+            git commit -m "Sync 9router data from abharhit instance"
             # Pull first in case another run pushed before us
             git pull --rebase origin "${{ github.ref_name }}" || true
             git push origin "${{ github.ref_name }}" || echo '⚠️ Push failed — changes saved locally'
@@ -177,9 +177,9 @@ jobs:
             echo 'ℹ️ chain=false — not dispatching a successor. Start the chain again manually or wait for the schedule rescue.'
             exit 0
           fi
-          gh workflow run linker.yml --repo "$REPO" --ref "${{ github.ref_name }}"
-          echo '✅ Next linker run dispatched — the chain continues'
-          echo 'ℹ️ To stop the chain for good: Actions tab -> linker -> Disable workflow'
+          gh workflow run abharhit.yml --repo "$REPO" --ref "${{ github.ref_name }}"
+          echo '✅ Next abharhit run dispatched — the chain continues'
+          echo 'ℹ️ To stop the chain for good: Actions tab -> abharhit -> Disable workflow'
 
       - name: 9. Tailscale Logout (cleanup on shutdown)
         if: always()
